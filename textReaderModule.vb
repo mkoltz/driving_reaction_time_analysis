@@ -1,7 +1,9 @@
 ﻿Module textReaderModule
-    Public Function Build_String_Array_From_Inputfile(ByRef inputFilename As String) As String(,)
+    Public Function Build_String_Array_From_Inputfile(ByRef inputFilename As String, ByRef worker As System.ComponentModel.BackgroundWorker) As String(,)
         Dim numLines As Integer = 0
         Dim longestLine As Integer = 0
+        Dim filename As String = System.IO.Path.GetFileName(inputFilename)
+        worker.ReportProgress(0, {True, filename, 1})
 
         'analyze the text file to determine the required array dimensions 
         Using lineCounter As New Microsoft.VisualBasic.FileIO.TextFieldParser(inputFilename)
@@ -17,14 +19,16 @@
                 End If
 
                 numLines = numLines + 1
+
             End While
 
         End Using
 
+
         'dimension the output array based on the size requirements determined above
         Dim outputArray(numLines - 1, longestLine - 1) As String
 
-
+        worker.ReportProgress(0, {True, filename, 2})
         Using myReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(inputFilename)
 
             myReader.TextFieldType = FileIO.FieldType.Delimited
@@ -50,6 +54,8 @@
                 'move to the next index in the array
                 elementNumber = 0
                 index = index + 1
+
+                worker.ReportProgress((index / numLines) * 100, {False, filename, 2})
             End While
 
         End Using
