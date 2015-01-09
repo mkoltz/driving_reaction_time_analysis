@@ -3,62 +3,23 @@
         Dim numLines As Integer = 0
         Dim longestLine As Integer = 0
         Dim filename As String = System.IO.Path.GetFileName(inputFilename)
-        worker.ReportProgress(0, {True, filename, 1})
 
-        'analyze the text file to determine the required array dimensions 
-        Using lineCounter As New Microsoft.VisualBasic.FileIO.TextFieldParser(inputFilename)
-            lineCounter.TextFieldType = FileIO.FieldType.Delimited
-            lineCounter.SetDelimiters(vbTab, ",")
+        numLines = System.IO.File.ReadAllLines(inputFilename).Length
 
-            While Not lineCounter.EndOfData
-                Dim currentLineLength As Integer
-                currentLineLength = lineCounter.ReadFields().Length
-
-                If currentLineLength > longestLine Then
-                    longestLine = currentLineLength
-                End If
-
-                numLines = numLines + 1
-
-            End While
-
-        End Using
-
+        Dim file() As String = System.IO.File.ReadAllLines(inputFilename)
 
         'dimension the output array based on the size requirements determined above
-        Dim outputArray(numLines - 1, longestLine - 1) As String
+        Dim outputArray(numLines - 1, 6) As String
 
         worker.ReportProgress(0, {True, filename, 2})
-        Using myReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(inputFilename)
+        For x As Integer = 1 To file.GetUpperBound(0)
 
-            myReader.TextFieldType = FileIO.FieldType.Delimited
-            myReader.SetDelimiters(",", vbTab)
+            Dim row() As String = file(x).Split(vbTab)
 
-
-            Dim currentRow As String()
-            Dim index, elementNumber As Integer
-            index = 0
-            elementNumber = 0
-
-            While Not myReader.EndOfData
-
-                'read the current row into a string array 
-                currentRow = myReader.ReadFields
-
-                For Each element In currentRow
-                    'add each item in the currentRow string array to the output array
-                    outputArray(index, elementNumber) = element
-                    elementNumber = elementNumber + 1
-                Next
-
-                'move to the next index in the array
-                elementNumber = 0
-                index = index + 1
-
-                worker.ReportProgress((index / numLines) * 100, {False, filename, 2})
-            End While
-
-        End Using
+            For y As Integer = 0 To row.GetUpperBound(0)
+                outputArray(x, y) = row(y)
+            Next
+        Next
 
         Return outputArray
 
