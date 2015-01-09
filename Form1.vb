@@ -4,10 +4,12 @@
     Dim startArray(10) As Integer
     Dim Trackarray(10, 18) As Array
     Dim numFilesProcessed As Integer = 0
+    Dim outputFile As String
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         BackgroundWorker1.WorkerReportsProgress = True
-
+        SaveFileDialog_outputFile.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
+        OpenFileDialog_signFile.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
     End Sub
 
     Public Sub setupSigns()
@@ -29,15 +31,17 @@
 
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-
+    Private Sub Button_start_Click(sender As Object, e As EventArgs) Handles Button_start.Click
+        outputFile = TextBox_outputFile.Text
         If BackgroundWorker1.IsBusy <> True Then
             BackgroundWorker1.RunWorkerAsync()
         End If
 
     End Sub
 
-    Public Sub analyze_File(ByRef path As String, ByRef worker As System.ComponentModel.BackgroundWorker)
+    Public Sub analyze_File(ByRef path As String, ByRef outputFile As String, ByRef worker As System.ComponentModel.BackgroundWorker)
+
+
         startArray(1) = 0
         startArray(2) = 3335
         startArray(3) = 6510
@@ -69,8 +73,6 @@
 
         For signNum As Integer = 1 To 18
 
-
-
             Dim signVisible As Integer = Trackarray(track, signNum)(1) + startArray(track) - 80
 
             While input_array(row, 2) < signVisible
@@ -78,12 +80,18 @@
             End While
 
             Dim signVisibleTime As Double = input_array(row, 0)
+            Dim angleReachedTime As Double
 
-            While input_array(row, 4) < 3 And input_array(row, 4) > -3
-                row += 1
-            End While
+            Try
+                While input_array(row, 4) < 3 And input_array(row, 4) > -3
+                    row += 1
+                End While
+            
+                angleReachedTime = input_array(row, 0)
 
-            Dim angleReachedTime As Double = input_array(row, 0)
+            Catch ex As Exception
+                angleReachedTime = signVisibleTime
+            End Try
 
             Dim reactionTime As Double = angleReachedTime - signVisibleTime
             If (reactionTime > 100) Then
@@ -96,7 +104,7 @@
 
         trackAverage = Math.Round(trackAverage / count, 3)
 
-        Using writer As New System.IO.StreamWriter(TextBox_outputFile.Text, True)
+        Using writer As New System.IO.StreamWriter(outputFile, True)
             writer.WriteLine(System.IO.Path.GetFileName(path) & vbTab & trackAverage & vbTab & count)
         End Using
 
@@ -108,7 +116,7 @@
         FolderStructureNavigation.numFiles = 0
         numFilesProcessed = 0
         count_files(TextBox_inputFolder.Text, BackgroundWorker1)
-        navigate_Folder_Structure(TextBox_inputFolder.Text, BackgroundWorker1)
+        navigate_Folder_Structure(TextBox_inputFolder.Text, TextBox_outputFile.Text, BackgroundWorker1)
     End Sub
 
     Public newState As Boolean = False
@@ -146,6 +154,38 @@
         End Try
 
         ProgressBar1.Value = e.ProgressPercentage
+
+    End Sub
+
+    Private Sub Button_inputFolderBrowse_Click(sender As Object, e As EventArgs) Handles Button_inputFolderBrowse.Click
+        FolderBrowserDialog_inputFolder.SelectedPath = TextBox_inputFolder.Text
+
+        Dim result As DialogResult = FolderBrowserDialog_inputFolder.ShowDialog()
+
+        If result = Windows.Forms.DialogResult.OK Then
+            TextBox_inputFolder.Text = FolderBrowserDialog_inputFolder.SelectedPath
+        End If
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+
+        SaveFileDialog_outputFile.InitialDirectory = System.IO.Path.GetDirectoryName(TextBox_outputFile.Text)
+
+        Dim result As DialogResult = SaveFileDialog_outputFile.ShowDialog()
+
+        If result = Windows.Forms.DialogResult.OK Then
+            TextBox_outputFile.Text = SaveFileDialog_outputFile.FileName
+        End If
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        OpenFileDialog_signFile.InitialDirectory = System.IO.Path.GetDirectoryName(TextBox_signLocationFile.Text)
+
+        Dim result As DialogResult = OpenFileDialog_signFile.ShowDialog()
+
+        If result = Windows.Forms.DialogResult.OK Then
+            TextBox_signLocationFile.Text = OpenFileDialog_signFile.FileName
+        End If
 
     End Sub
 End Class

@@ -9,3 +9,4 @@ E:\OneDrive\Documents\School\Thesis\Force Feedback\ReactionTimeAnalysis\obj\Debu
 E:\OneDrive\Documents\School\Thesis\Force Feedback\ReactionTimeAnalysis\obj\Debug\ReactionTimeAnalysis.exe
 E:\OneDrive\Documents\School\Thesis\Force Feedback\ReactionTimeAnalysis\obj\Debug\ReactionTimeAnalysis.xml
 E:\OneDrive\Documents\School\Thesis\Force Feedback\ReactionTimeAnalysis\obj\Debug\ReactionTimeAnalysis.pdb
+E:\OneDrive\Documents\School\Thesis\Force Feedback\ReactionTimeAnalysis\obj\Debug\ReactionTimeAnalysis.vbprojResolveAssemblyReference.cache
