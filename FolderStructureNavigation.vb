@@ -2,18 +2,18 @@
 
     Public numFiles As Integer = 0
 
-    Public Sub navigate_Folder_Structure(ByRef rootDirectory As String, ByRef outputFilename As String, ByVal worker As System.ComponentModel.BackgroundWorker)
+    Public Sub navigate_Folder_Structure(ByRef rootDirectory As String, ByRef outputFilename As String, ByVal worker As System.ComponentModel.BackgroundWorker, ByVal LineLength As Integer, ByVal driving As Boolean)
 
         If My.Computer.FileSystem.GetDirectories(rootDirectory).Count > 0 Then
 
             For Each folder As String In My.Computer.FileSystem.GetDirectories(rootDirectory)
-                navigate_Folder_Structure(folder, outputFilename, worker)
+                navigate_Folder_Structure(folder, outputFilename, worker, LineLength, driving)
             Next
 
         Else
             For Each file As String In My.Computer.FileSystem.GetFiles(rootDirectory)
 
-                Call Form1.analyze_File(file, outputFilename, worker)
+                Call Form1.analyze_File(file, outputFilename, worker, LineLength, driving)
 
             Next
         End If

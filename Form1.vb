@@ -1,6 +1,7 @@
 ﻿Public Class Form1
 
     Public state(1) As String
+    Public inputLineLength As Integer = 0
     Dim startArray(10) As Integer
     Dim Trackarray(10, 18) As Array
     Dim numFilesProcessed As Integer = 0
@@ -32,6 +33,8 @@
     End Sub
 
     Private Sub Button_start_Click(sender As Object, e As EventArgs) Handles Button_start.Click
+       
+
         outputFile = TextBox_outputFile.Text
         If BackgroundWorker1.IsBusy <> True Then
             BackgroundWorker1.RunWorkerAsync()
@@ -39,7 +42,7 @@
 
     End Sub
 
-    Public Sub analyze_File(ByRef path As String, ByRef outputFile As String, ByRef worker As System.ComponentModel.BackgroundWorker)
+    Public Sub analyze_File(ByRef path As String, ByRef outputFile As String, ByRef worker As System.ComponentModel.BackgroundWorker, ByVal LineLength As Integer, ByVal driving As Boolean)
 
 
         startArray(1) = 0
@@ -55,68 +58,126 @@
 
         setupSigns()
 
-        worker.ReportProgress(0, {False, System.IO.Path.GetFileName(path), 3, numFilesProcessed})
 
-        Dim count As Integer = 0
-        Dim trackAverage As Double = 0
-        Dim input_array(,) As String = Build_String_Array_From_Inputfile(path, worker)
-        ' Dim input_array As ArrayList(,)
-        Dim track As Byte = input_array(input_array.GetUpperBound(0), 5)
+        Dim input_array(,) As String = Build_String_Array_From_Inputfile(path, worker, LineLength)
 
-        Dim row As Integer = 1
+        If driving Then
 
-        While input_array(row, 5) <> track
-            row += 1
-        End While
+            Dim count As Integer = 0
+            Dim trackAverage As Double = 0
 
-        worker.ReportProgress(0, {True, System.IO.Path.GetFileName(path), 3, numFilesProcessed})
+            ' Dim input_array As ArrayList(,)
+            Dim track As Byte = input_array(input_array.GetUpperBound(0), 5)
 
-        For signNum As Integer = 1 To 18
+            Dim row As Integer = 1
 
-            Dim signVisible As Integer = Trackarray(track, signNum)(1) + startArray(track) - 80
-
-            While input_array(row, 2) < signVisible
+            While input_array(row, 5) <> track
                 row += 1
             End While
 
-            Dim signVisibleTime As Double = input_array(row, 0)
-            Dim angleReachedTime As Double
+            worker.ReportProgress(0, {True, System.IO.Path.GetFileName(path), 3, numFilesProcessed})
 
-            Try
-                While input_array(row, 4) < 3 And input_array(row, 4) > -3
+            Dim current_lane As Integer = 1
+            Dim left_turn As Boolean = False
+            Dim signVisible As Integer
+
+            For signNum As Integer = 1 To 18
+
+                signVisible = Trackarray(track, signNum)(1) + startArray(track) - 80
+
+                If (current_lane > Trackarray(track, signNum)(0)) Then
+                    left_turn = True
+                Else
+                    left_turn = False
+                End If
+
+                current_lane = Trackarray(track, signNum)(0)
+
+                While input_array(row, 2) < signVisible
                     row += 1
                 End While
-            
-                angleReachedTime = input_array(row, 0)
 
-            Catch ex As Exception
-                angleReachedTime = signVisibleTime
-            End Try
+                Dim signVisibleTime As Double = input_array(row, 0)
+                Dim angleReachedTime As Double
 
-            Dim reactionTime As Double = angleReachedTime - signVisibleTime
-            If (reactionTime > 100) Then
-                trackAverage += reactionTime
-                count += 1
-            End If
+                Try
+                    If (left_turn) Then
+                        While input_array(row, 4) < 3
+                            row += 1
+                        End While
+                    Else
+                        While input_array(row, 4) > -3
+                            row += 1
+                        End While
+                    End If
+                    
 
-            worker.ReportProgress((signNum / 18) * 100, {False, System.IO.Path.GetFileName(path), 3})
-        Next
+                    angleReachedTime = input_array(row, 0)
 
-        trackAverage = Math.Round(trackAverage / count, 3)
+                Catch ex As Exception
+                    angleReachedTime = signVisibleTime
+                End Try
 
-        Using writer As New System.IO.StreamWriter(outputFile, True)
-            writer.WriteLine(System.IO.Path.GetFileName(path) & vbTab & trackAverage & vbTab & count)
-        End Using
+                Dim reactionTime As Double = angleReachedTime - signVisibleTime
+                If (reactionTime > 100) Then
+                    trackAverage += reactionTime
+                    count += 1
+                End If
+
+                worker.ReportProgress((signNum / 18) * 100, {False, System.IO.Path.GetFileName(path), 3})
+            Next
+
+            trackAverage = Math.Round(trackAverage / count, 3)
+
+            Using writer As New System.IO.StreamWriter(outputFile, True)
+                writer.WriteLine(System.IO.Path.GetFileName(path) & vbTab & trackAverage & vbTab & count)
+            End Using
+
+        Else
+
+            Dim overall_average, inside_average, movement_average As Double
+            Dim numTargets As Integer = 0
+
+            For row As Integer = 0 To input_array.GetUpperBound(0)
+
+                If input_array(row, 0) <> "" Then
+
+                    overall_average += input_array(row, 10)
+                    inside_average += input_array(row, 11)
+                    movement_average += input_array(row, 10) - input_array(row, 11)
+                    numTargets += 1
+
+                End If
+
+
+            Next
+
+            overall_average = Math.Round(overall_average / numTargets, 3)
+            inside_average = Math.Round(inside_average / numTargets, 3)
+            movement_average = Math.Round(movement_average / numTargets, 3)
+
+            Using writer As New System.IO.StreamWriter(outputFile, True)
+                writer.WriteLine(System.IO.Path.GetFileName(path) & vbTab & overall_average & vbTab & movement_average & vbTab & inside_average & vbTab & numTargets)
+            End Using
+
+        End If
 
         numFilesProcessed += 1
+        worker.ReportProgress(0, {False, System.IO.Path.GetFileName(path), 3, numFilesProcessed})
     End Sub
 
 
     Private Sub BackgroundWorker1_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles BackgroundWorker1.DoWork
+
+        If RadioButton_driving.Checked Then
+            inputLineLength = 6
+        Else
+            inputLineLength = 11
+        End If
         FolderStructureNavigation.numFiles = 0
         numFilesProcessed = 0
         count_files(TextBox_inputFolder.Text, BackgroundWorker1)
-        navigate_Folder_Structure(TextBox_inputFolder.Text, TextBox_outputFile.Text, BackgroundWorker1)
+        navigate_Folder_Structure(TextBox_inputFolder.Text, TextBox_outputFile.Text, BackgroundWorker1, inputLineLength, RadioButton_driving.Checked)
     End Sub
 
     Public newState As Boolean = False

@@ -45,7 +45,11 @@ Partial Class Form1
         Me.FolderBrowserDialog_inputFolder = New System.Windows.Forms.FolderBrowserDialog()
         Me.OpenFileDialog_signFile = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog_outputFile = New System.Windows.Forms.SaveFileDialog()
+        Me.RadioButton_driving = New System.Windows.Forms.RadioButton()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.RadioButton_target = New System.Windows.Forms.RadioButton()
         Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_start
@@ -99,8 +103,7 @@ Partial Class Form1
         Me.TextBox_outputFile.Name = "TextBox_outputFile"
         Me.TextBox_outputFile.Size = New System.Drawing.Size(484, 20)
         Me.TextBox_outputFile.TabIndex = 5
-        Me.TextBox_outputFile.Text = "E:\OneDrive\Documents\School\Thesis\Force Feedback\run_documents\reactionTime2.tx" & _
-    "t"
+        Me.TextBox_outputFile.Text = "E:\OneDrive\Documents\School\Thesis\Force Feedback\run_documents\TS_Test.txt"
         '
         'TextBox_inputFolder
         '
@@ -108,8 +111,8 @@ Partial Class Form1
         Me.TextBox_inputFolder.Name = "TextBox_inputFolder"
         Me.TextBox_inputFolder.Size = New System.Drawing.Size(484, 20)
         Me.TextBox_inputFolder.TabIndex = 6
-        Me.TextBox_inputFolder.Text = "E:\OneDrive\Documents\School\Thesis\Force Feedback\run_documents\Driving_Data\S10" & _
-    "2"
+        Me.TextBox_inputFolder.Text = "E:\OneDrive\Documents\School\Thesis\Force Feedback\run_documents\TargetSelection_" & _
+    "output\Output files\S102\Block_0-noForce"
         '
         'Label1
         '
@@ -229,11 +232,45 @@ Partial Class Form1
         '
         Me.OpenFileDialog_signFile.FileName = "OpenFileDialog1"
         '
+        'RadioButton_driving
+        '
+        Me.RadioButton_driving.AutoSize = True
+        Me.RadioButton_driving.Location = New System.Drawing.Point(10, 21)
+        Me.RadioButton_driving.Name = "RadioButton_driving"
+        Me.RadioButton_driving.Size = New System.Drawing.Size(84, 17)
+        Me.RadioButton_driving.TabIndex = 19
+        Me.RadioButton_driving.Text = "Driving Data"
+        Me.RadioButton_driving.UseVisualStyleBackColor = True
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.RadioButton_target)
+        Me.GroupBox2.Controls.Add(Me.RadioButton_driving)
+        Me.GroupBox2.Location = New System.Drawing.Point(26, 160)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(200, 46)
+        Me.GroupBox2.TabIndex = 20
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Analysis Type"
+        '
+        'RadioButton_target
+        '
+        Me.RadioButton_target.AutoSize = True
+        Me.RadioButton_target.Checked = True
+        Me.RadioButton_target.Location = New System.Drawing.Point(106, 21)
+        Me.RadioButton_target.Name = "RadioButton_target"
+        Me.RadioButton_target.Size = New System.Drawing.Size(82, 17)
+        Me.RadioButton_target.TabIndex = 20
+        Me.RadioButton_target.TabStop = True
+        Me.RadioButton_target.Text = "Target Data"
+        Me.RadioButton_target.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(600, 356)
+        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label4)
@@ -249,6 +286,8 @@ Partial Class Form1
         Me.Text = "Reaction Time"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -276,5 +315,8 @@ Partial Class Form1
     Friend WithEvents FolderBrowserDialog_inputFolder As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents OpenFileDialog_signFile As System.Windows.Forms.OpenFileDialog
     Friend WithEvents SaveFileDialog_outputFile As System.Windows.Forms.SaveFileDialog
+    Friend WithEvents RadioButton_driving As System.Windows.Forms.RadioButton
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents RadioButton_target As System.Windows.Forms.RadioButton
 
 End Class
